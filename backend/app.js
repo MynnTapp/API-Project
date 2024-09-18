@@ -10,6 +10,8 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
 const routes = require("./routes");
+const { environment } = require("./config");
+const isProduction = environment === "production";
 
 // Security Middleware
 if (!isProduction) {
