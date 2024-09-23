@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const authMiddleware = require("../utils/auth");
+const spotImage = require("../models/SpotImages");
 
 router.use(authMiddleware.authenticate);
 
@@ -23,4 +24,18 @@ app.post("/api/spots/:spotId/images", (res, req) => {
       }
     }
   );
+});
+
+app.delete("/api/spots/:spotId/images", async (req, res) => {
+  const spotId = req.params.spotId;
+  const findSpot = await spotImage.findbypk(spotId);
+  if (!findSpot) {
+    return res.status(404).send({ message: "Spot image not found" });
+  }
+  const imageId = req.body.imageId;
+  const deleteImage = await spotImage.deleteImage(spotId, imageId);
+  if (!deleteImage) {
+    return res.status(404).send({ message: "Spot image not found" });
+  }
+  res.send({ message: "Spot image deleted successfully" });
 });
