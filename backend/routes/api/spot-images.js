@@ -1,5 +1,8 @@
 const express = require("express");
 const app = express();
+const authMiddleware = require("../utils/auth");
+
+router.use(authMiddleware.authenticate);
 
 app.post("/api/spots/:spotId/images", (res, req) => {
   const spotId = req.params.spotId;
