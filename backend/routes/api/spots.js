@@ -16,9 +16,57 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/", async (req, res) => {
+  const { page = 1, size = 10, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
+  if (page < 1 || size < 1 || size > 100) {
+    return res.status(400).send({ message: "Page or size is invalid" });
+  }
+  if (minLat && maxLat && minLat > maxLat) {
+    return res.status(400).send({ message: "Latitude range is Invalid" });
+  }
+  if (minLng && maxLng && minLng > maxLng) {
+    return res.status(400).send({ message: "Longitude range is invalid" });
+  }
+  if (minPrice && maxPrice && minPrice > maxPrice) {
+    return res.status(400).send({ message: "Price range is Invalid" });
+  }
+  const options = {
+    offset: (page - 1) * size,
+    limit: size,
+  };
+
+  if (minLat && maxLat) {
+    options.where = {
+      lat: {
+        [Op.gte]: minLat,
+        [Op.lte]: maxLat,
+      },
+    };
+  }
+  if (minLng && maxLng) {
+    options.where = {
+      lng: {
+        [Op.gte]: minLng,
+        [Op.lte]: maxLng,
+      },
+    };
+  }
+  if (minPrice && maxPrice) {
+    options.where = {
+      price: {
+        [Op.gte]: minPrice,
+        [Op.lte]: maxPrice,
+      },
+    };
+  }
   try {
-    const spots = await Spot.findAll();
-    res.send(spots);
+    const spots = await Spot.findAll(options);
+    const totalCount = await Spot.count(options);
+    res.send({
+      spots,
+      page,
+      size,
+      totalCount,
+    });
   } catch (error) {
     res.status(500).send({ message: "Error fetching spots" });
   }
