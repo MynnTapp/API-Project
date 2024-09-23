@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const Spot = require("../models/Spot");
+const { requireAuth } = require("../../utils/auth");
 
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
   try {
     const spot = await Spot.create(req.body);
     res.status(201).send(spot);
@@ -11,7 +12,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
+router.get("/", requireAuth, async (req, res) => {
   try {
     const spots = await Spot.findAll();
     res.send(spots);
