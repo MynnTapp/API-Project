@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Spot = require("../models/Spot");
 
+const authMiddleware = require("../utils/auth");
+
+router.use(authMiddleware.authenticate);
+
 router.post("/", async (req, res) => {
   try {
     const spot = await Spot.create(req.body);
