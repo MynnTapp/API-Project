@@ -1,7 +1,8 @@
 const express = require("express");
 const app = express();
+const { requireAuth } = require("../../utils/auth");
 
-app.post("/api/spots/:spotId/images", (res, req) => {
+app.post("/api/spots/:spotId/images", requireAuth, (res, req) => {
   const spotId = req.params.spotId;
   const image = req.body;
   const db = req.db;
