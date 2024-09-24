@@ -2,10 +2,10 @@
 const express = require("express");
 const { Op } = require("sequelize");
 const bcrypt = require("bcryptjs");
-const { setTokenCookie, restoreUser } = require("../../authentication/auth");
+const { setTokenCookie, restoreUser } = require("../../utils/auth");
 const { User } = require("../../db/models");
 const { check } = require("express-validator");
-const { handleValidationErrors } = require("../../authentication/validation");
+const { handleValidationErrors } = require("../../utils/validation");
 const router = express.Router();
 
 // Middleware
@@ -17,12 +17,12 @@ const validateLogin = [
 
 // Restore session user
 router.get("/", (req, res) => {
-  const { user } = req;
-  if (user) {
+  const { User } = req;
+  if (User) {
     const safeUser = {
-      id: user.id,
-      email: user.email,
-      username: user.username,
+      id: User.id,
+      email: User.email,
+      username: User.username,
     };
     return res.json({
       user: safeUser,
