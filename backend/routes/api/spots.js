@@ -5,111 +5,219 @@ const Spot = require("../models/Spot");
 const authMiddleware = require("../utils/auth");
 
 router.use(authMiddleware.authenticate);
+const { requireAuth } = require("../../utils/auth");
 
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
   try {
-    const spot = await Spot.create(req.body);
-    res.status(201).send(spot);
-  } catch (error) {
-    res.status(400).send({ message: "Error creating spot" });
+    const { address, city, state, country, lat, lng, name, description, price } = req.body;
+
+    // Validate the request body
+    if (!address || !city || !state || !country || !lat || !lng || !name || !description || !price) {
+      return res.status(400).json({ message: "Invalid request body" });
+    }
+
+    if (typeof lat !== "number" || typeof lng !== "number" || typeof price !== "number") {
+      return res.status(400).json({ message: "Invalid data type" });
+    }
+
+    if (price < 0) {
+      return res.status(400).json({ message: "Price cannot be negative" });
+    }
+
+    const newSpot = await Spot.create({
+      ownerId: req.user.id,
+      address,
+      city,
+      state,
+      country,
+      lat,
+      lng,
+      name,
+      description,
+      price,
+    });
+
+    res.json(newSpot);
+  } catch (err) {
+    res.status(500).json({ message: "Error creating spot" });
   }
 });
 
 router.get("/", async (req, res) => {
-  const { page = 1, size = 10, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
-  if (page < 1 || size < 1 || size > 100) {
-    return res.status(400).send({ message: "Page or size is invalid" });
-  }
-  if (minLat && maxLat && minLat > maxLat) {
-    return res.status(400).send({ message: "Latitude range is Invalid" });
-  }
-  if (minLng && maxLng && minLng > maxLng) {
-    return res.status(400).send({ message: "Longitude range is invalid" });
-  }
-  if (minPrice && maxPrice && minPrice > maxPrice) {
-    return res.status(400).send({ message: "Price range is Invalid" });
-  }
-  const options = {
-    offset: (page - 1) * size,
-    limit: size,
-  };
-
-  if (minLat && maxLat) {
-    options.where = {
-      lat: {
-        [Op.gte]: minLat,
-        [Op.lte]: maxLat,
-      },
-    };
-  }
-  if (minLng && maxLng) {
-    options.where = {
-      lng: {
-        [Op.gte]: minLng,
-        [Op.lte]: maxLng,
-      },
-    };
-  }
-  if (minPrice && maxPrice) {
-    options.where = {
-      price: {
-        [Op.gte]: minPrice,
-        [Op.lte]: maxPrice,
-      },
-    };
-  }
   try {
-    const spots = await Spot.findAll(options);
-    const totalCount = await Spot.count(options);
-    res.send({
-      spots,
-      page,
-      size,
-      totalCount,
+    const spots = await Spot.findAll({
+      attributes: ["id", "ownerId", "address", "city", "state", "country", "lat", "lng", "name", "description", "price", "createdAt", "updatedAt", "previewImage", "avgRating"],
     });
-  } catch (error) {
-    res.status(500).send({ message: "Error fetching spots" });
+
+    res.json(spots);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching spots" });
+  }
+});
+
+router.put("/:id", requireAuth, async (req, res) => {
+  try {
+    const spotId = req.params.id;
+    const userId = req.user.id;
+    const spot = await Spot.findByPk(spotId);
+
+    if (!spot) {
+      return res.status(404).json({ message: "Spot not found" });
+    }
+
+    if (spot.ownerId !== userId) {
+      return res.status(403).json({ message: "Unauthorized to edit spot" });
+    }
+
+    const { address, city, state, country, lat, lng, name, description, price } = req.body;
+
+    // Validate the request body
+    if (!address || !city || !state || !country || !lat || !lng || !name || !description || !price) {
+      return res.status(400).json({ message: "Invalid request body" });
+    }
+
+    if (typeof lat !== "number" || typeof lng !== "number" || typeof price !== "number") {
+      return res.status(400).json({ message: "Invalid data type" });
+    }
+
+    if (price < 0) {
+      return res.status(400).json({ message: "Price cannot be negative" });
+    }
+
+    await spot.update({
+      address,
+      city,
+      state,
+      country,
+      lat,
+      lng,
+      name,
+      description,
+      price,
+    });
+
+    res.json(spot);
+  } catch (err) {
+    res.status(500).json({ message: "Error updating spot" });
+  }
+});
+
+router.delete("/:id", requireAuth, async (req, res) => {
+  try {
+    const spotId = req.params.id;
+    const userId = req.user.id;
+    const spot = await Spot.findByPk(spotId);
+
+    if (!spot) {
+      return res.status(404).json({ message: "Spot not found" });
+    }
+
+    if (spot.ownerId !== userId) {
+      return res.status(403).json({ message: "Unauthorized to delete spot" });
+    }
+
+    await spot.destroy();
+
+    res.status(204).json({ message: "Spot deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting spot" });
   }
 });
 
 router.get("/:id", async (req, res) => {
   try {
-    const spot = await Spot.findByPk(req.params.id);
+    const spotId = req.params.id;
+    const spot = await Spot.findByPk(spotId, {
+      attributes: ["id", "ownerId", "address", "city", "state", "country", "lat", "lng", "name", "description", "price", "createdAt", "updatedAt"],
+      include: [
+        {
+          model: SpotImage,
+          attributes: ["id", "url", "preview"],
+        },
+        {
+          model: Owner,
+          attributes: ["id", "firstName", "lastName"],
+        },
+      ],
+    });
+
     if (!spot) {
-      res.status(404).send({ message: "Spot not found" });
-    } else {
-      res.send(spot);
+      return res.status(404).json({ message: "Spot not found" });
     }
-  } catch (error) {
-    res.status(500).send({ message: "Error fetching spot" });
+
+    const numReviews = await Review.count({ where: { spotId } });
+    const avgStarRating = await Review.average("starRating", { where: { spotId } });
+
+    spot.dataValues.numReviews = numReviews;
+    spot.dataValues.avgStarRating = avgStarRating;
+
+    res.json(spot);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching spot" });
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
-    const spot = await Spot.findByPk(req.params.id);
+    const spotId = req.params.id;
+    const spot = await Spot.findByPk(spotId, {
+      attributes: ["id", "ownerId", "address", "city", "state", "country", "lat", "lng", "name", "description", "price", "createdAt", "updatedAt"],
+      include: [
+        {
+          model: SpotImage,
+          attributes: ["id", "url", "preview"],
+        },
+        {
+          model: Owner,
+          attributes: ["id", "firstName", "lastName"],
+        },
+      ],
+    });
+
     if (!spot) {
-      res.status(404).send({ message: "Spot not found" });
-    } else {
-      await spot.update(req.body);
-      res.send(spot);
+      return res.status(404).json({ message: "Spot not found" });
     }
-  } catch (error) {
-    res.status(400).send({ message: "Error updating spot" });
+
+    const numReviews = await Review.count({ where: { spotId } });
+    const avgStarRating = await Review.average("starRating", { where: { spotId } });
+
+    spot.dataValues.numReviews = numReviews;
+    spot.dataValues.avgStarRating = avgStarRating;
+
+    res.json(spot);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching spot" });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.get("/spots/:userId", requireAuth, async (req, res) => {
   try {
-    const spot = await Spot.findByPk(req.params.id);
-    if (!spot) {
-      res.status(404).send({ message: "Spot not found" });
-    } else {
-      await spot.destroy();
-      res.status(204).send({ message: "Spot deleted" });
-    }
-  } catch (error) {
-    res.status(500).send({ message: "Error deleting spot" });
+    const userId = req.user.id;
+    const spots = await Spot.findAll({
+      where: { ownerId: userId },
+      attributes: ["id", "ownerId", "address", "city", "state", "country", "lat", "lng", "name", "description", "price", "createdAt", "updatedAt", "previewImage"],
+      include: [
+        {
+          model: Review,
+          attributes: [],
+          required: false,
+        },
+      ],
+    });
+
+    const spotsWithAvgRating = await Promise.all(
+      spots.map(async (spot) => {
+        const avgRating = await Review.average("starRating", {
+          where: { spotId: spot.id },
+        });
+        spot.dataValues.avgRating = avgRating;
+        return spot;
+      })
+    );
+
+    res.json(spotsWithAvgRating);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching spots" });
   }
 });
 
