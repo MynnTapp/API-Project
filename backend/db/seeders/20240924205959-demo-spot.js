@@ -22,59 +22,69 @@ module.exports = {
     await Spot.bulkCreate(
       [
         {
-          "address": "123 Disney Lane",
-          "city": "San Francisco",
-          "state": "California",
-          "country": "United States of America",
-          "lat": 37.7645358,
-          "lng": -122.4730327,
-          "name": "App Academy",
-          "description": "Place where web developers are created",
-          "price": 123
+          id: 1,
+          ownerId: 1,
+          address: "123 Disney Lane",
+          city: "San Francisco",
+          state: "California",
+          country: "United States of America",
+          lat: 37.7645358,
+          lng: -122.4730327,
+          name: "App Academy",
+          description: "Place where web developers are created",
+          price: 123
         },
         {
-          "address": "456 Pixar Drive",
-          "city": "Los Angeles",
-          "state": "California",
-          "country": "United States of America",
-          "lat": 86.0283756,
-          "lng": -118.9472658,
-          "name": "Code Smyth",
-          "description": "Some other place",
-          "price": 456
+          id: 2,
+          ownerId: 1,
+          address: "456 Pixar Drive",
+          city: "Los Angeles",
+          state: "California",
+          country: "United States of America",
+          lat: 86.0283756,
+          lng: -118.9472658,
+          name: "Code Smyth",
+          description: "Some other place",
+          price: 456
         },
         {
-          "address": "1800 Drury Lane",
-          "city": "Chicago",
-          "state": "Illinois",
-          "country": "United States of America",
-          "lat": 55.8765123,
-          "lng": -100.9994445,
-          "name": "The Bean",
-          "description": "Shiny big bean",
-          "price": 7373
+          id: 3,
+          ownerId: 2,
+          address: "1800 Drury Lane",
+          city: "Chicago",
+          state: "Illinois",
+          country: "United States of America",
+          lat: 55.8765123,
+          lng: -100.9994445,
+          name: "The Bean",
+          description: "Shiny big bean",
+          price: 7373
         },
         {
-          "address": "999 First Street",
-          "city": "New York",
-          "state": "New York",
-          "country": "United States of America",
-          "lat": 12.3456789,
-          "lng": -123.4567890,
-          "name": "Big Apple",
-          "description": "Big city with lots of stuff",
-          "price": 999
+          id: 4,
+          ownerId: 3,
+          address: "999 First Street",
+          city: "New York",
+          state: "New York",
+          country: "United States of America",
+          lat: 12.3456789,
+          lng: -123.4567890,
+          name: "Big Apple",
+          description: "Big city with lots of stuff",
+          price: 999
         },
         {
-          "address": "555 Party Ave",
-          "city": "Orlando",
-          "state": "Florida",
-          "country": "United States of America",
-          "lat": 98.7654321,
-          "lng": -87.1749827,
-          "name": "Spring Break",
-          "description": "Hot sandy beaches",
-          "price": 555
+          id: 5,
+          ownerId: 2,
+          address: "555 Party Ave",
+          city: "Orlando",
+          state: "Florida",
+          country: "United States of America",
+          lat: 98.7654321,
+          lng: -87.1749827,
+          name: "Spring Break",
+          description: "Hot sandy beaches",
+          price: 555
         }
       ],
       { validate: true }
@@ -89,13 +99,7 @@ module.exports = {
      * await queryInterface.bulkDelete('People', null, {});
      */
     await queryInterface.bulkDelete('Spots', {
-      name: [
-        "App Academy",
-        "Code Smyth",
-        "The Bean",
-        "Big Apple",
-        "Spring Break"
-      ]
+      id: [1, 2, 3, 4, 5]
     }, options)
   }
 };
