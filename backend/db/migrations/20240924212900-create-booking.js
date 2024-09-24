@@ -37,12 +37,6 @@ module.exports = {
       endDate: {
         type: Sequelize.DATE,
       },
-      totalPrice: {
-        type: Sequelize.DECIMAL(10, 2),
-      },
-      status: {
-        type: Sequelize.STRING,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

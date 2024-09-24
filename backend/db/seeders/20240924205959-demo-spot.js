@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-const { Spot } = require('../models');
+const { Spot } = require("../models");
 
 let options = {};
-if(process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   options.schema = process.env.SCHEMA;
 }
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up (queryInterface, Sequelize) {
+  async up(queryInterface, Sequelize) {
     /**
      * Add seed commands here.
      *
@@ -18,11 +18,10 @@ module.exports = {
      *   name: 'John Doe',
      *   isBetaMember: false
      * }], {});
-    */
+     */
     await Spot.bulkCreate(
       [
         {
-          id: 1,
           ownerId: 1,
           address: "123 Disney Lane",
           city: "San Francisco",
@@ -32,10 +31,9 @@ module.exports = {
           lng: -122.4730327,
           name: "App Academy",
           description: "Place where web developers are created",
-          price: 123
+          price: 123,
         },
         {
-          id: 2,
           ownerId: 1,
           address: "456 Pixar Drive",
           city: "Los Angeles",
@@ -45,10 +43,9 @@ module.exports = {
           lng: -118.9472658,
           name: "Code Smyth",
           description: "Some other place",
-          price: 456
+          price: 456,
         },
         {
-          id: 3,
           ownerId: 2,
           address: "1800 Drury Lane",
           city: "Chicago",
@@ -58,48 +55,46 @@ module.exports = {
           lng: -100.9994445,
           name: "The Bean",
           description: "Shiny big bean",
-          price: 7373
+          price: 7373,
         },
         {
-          id: 4,
           ownerId: 3,
           address: "999 First Street",
           city: "New York",
           state: "New York",
           country: "United States of America",
           lat: 12.3456789,
-          lng: -123.4567890,
+          lng: -123.456789,
           name: "Big Apple",
           description: "Big city with lots of stuff",
-          price: 999
+          price: 999,
         },
         {
-          id: 5,
           ownerId: 2,
           address: "555 Party Ave",
           city: "Orlando",
           state: "Florida",
           country: "United States of America",
-          lat: 98.7654321,
+          lat: 88.7654321,
           lng: -87.1749827,
           name: "Spring Break",
           description: "Hot sandy beaches",
-          price: 555
-        }
+          price: 555,
+        },
       ],
       { validate: true }
     );
   },
 
-  async down (queryInterface, Sequelize) {
+  async down(queryInterface, Sequelize) {
     /**
      * Add commands to revert seed here.
      *
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
+     *
      */
-    await queryInterface.bulkDelete('Spots', {
-      id: [1, 2, 3, 4, 5]
-    }, options)
-  }
+    options.tableName = "Spots";
+    return queryInterface.bulkDelete(options, {}, {});
+  },
 };
