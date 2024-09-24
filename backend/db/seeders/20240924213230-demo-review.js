@@ -70,6 +70,6 @@ module.exports = {
      */
     await queryInterface.bulkDelete('Reviews', {
       id: [1, 2, 3, 4, 5]
-    }, options)
+    }, options);
   }
 };
