@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const Spot = require("../models/spot.js");
 const requireAuth = require("../../utils/auth");
 const Spot = require("../../db/models/spot.js");
 
