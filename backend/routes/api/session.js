@@ -16,8 +16,9 @@ const validateLogin = [
 ];
 
 // Restore session user
-router.get("/", (req, res) => {
-  const { User } = req;
+router.get("/", restoreUser, (req, res) => {
+  const User = req.user.dataValues;
+  
   if (User) {
     const safeUser = {
       id: User.id,
