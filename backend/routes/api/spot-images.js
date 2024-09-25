@@ -1,10 +1,10 @@
 const express = require("express");
 const app = express();
 const spotImage = require("../../db/models/spotimage.js");
-const { requireAuth } = require('../../utils/auth.js');
+const { requireAuth } = require("../../utils/auth.js");
 const router = express.Router();
 
-app.post("/api/spots/:spotId/images", requireAuth, (res, req) => {
+app.post("/spots/:spotId/images", requireAuth, (res, req) => {
   const spotId = req.params.spotId;
   const image = req.body;
   const db = req.db;
@@ -25,7 +25,7 @@ app.post("/api/spots/:spotId/images", requireAuth, (res, req) => {
   );
 });
 
-app.delete("/api/spots/:spotId/images", async (req, res) => {
+app.delete("spots/:spotId/images", async (req, res) => {
   const spotId = req.params.spotId;
   const findSpot = await spotImage.findbypk(spotId);
   if (!findSpot) {

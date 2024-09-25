@@ -95,7 +95,8 @@ module.exports = {
           spotId: 5,
           url: "Image.png",
           preview: false,
-        },{
+        },
+        {
           spotId: 4,
           url: "Image.png",
           preview: false,
