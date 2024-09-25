@@ -1,9 +1,8 @@
 const express = require("express");
 const app = express();
-
 const spotImage = require("../../db/models/spotimage.js");
-
 const { requireAuth } = require('../../utils/auth.js');
+const router = express.Router();
 
 app.post("/api/spots/:spotId/images", requireAuth, (res, req) => {
   const spotId = req.params.spotId;
@@ -39,3 +38,5 @@ app.delete("/api/spots/:spotId/images", async (req, res) => {
   }
   res.send({ message: "Spot image deleted successfully" });
 });
+
+module.exports = router;
