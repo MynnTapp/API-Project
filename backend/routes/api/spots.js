@@ -1,11 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const Spot = require("../models/Spot");
+const Spot = require("../../db/models/spot.js");
 
-const authMiddleware = require("../utils/auth");
-
-router.use(authMiddleware.authenticate);
-const { requireAuth } = require("../../utils/auth");
+const { requireAuth } = require("../../utils/auth.js");
 
 router.post("/", requireAuth, async (req, res) => {
   try {

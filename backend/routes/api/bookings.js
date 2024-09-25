@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const bookings = require("../models/bookings");
+const bookings = require("../../db/models/booking.js");
 const { requireAuth } = require("../../utils/auth");
-const spots = require("../models/spots");
+const spots = require("../../db/models/spot.js");
 
 router.get("/:spotsid", requireAuth, async (req, res) => {
   const spotId = req.params.spotsid;
