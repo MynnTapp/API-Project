@@ -18,10 +18,12 @@ const validateLogin = [
 // Restore session user
 router.get("/", restoreUser, (req, res) => {
   const User = req.user.dataValues;
-  
+
   if (User) {
     const safeUser = {
       id: User.id,
+      firstName: User.firstName,
+      lastName: User.lastName,
       email: User.email,
       username: User.username,
     };
