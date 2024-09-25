@@ -1,10 +1,6 @@
 const express = require("express");
 const router = express.Router();
-<<<<<<< HEAD
 const { Spot } = require("../../db/models");
-=======
-const { Spot } = require("../../db/models/spot.js");
->>>>>>> b958713cf5bd6522a19e03b822f2d0ef28d54613
 
 const { requireAuth } = require("../../utils/auth.js");
 
