@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
     const spots = await Spot.findAll();
     console.log(spots);
 
-    res.json(spots);
+    res.json({"Spots": spots});
   } catch (err) {
     res.status(500).json({ message: "Error fetching spots" });
   }
