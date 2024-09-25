@@ -43,11 +43,27 @@ router.post("/", requireAuth, async (req, res) => {
 router.get("/", async (req, res) => {
   try {
     const spots = await Spot.findAll();
-    console.log(spots);
 
     res.json({"Spots": spots});
   } catch (err) {
     res.status(500).json({ message: "Error fetching spots" });
+  }
+});
+
+router.get("/current", requireAuth, async (req, res) => {
+  try {
+    const currentUser = req.user;
+    console.log(currentUser);
+
+    const spots = await Spot.findAll({
+      where: {
+        ownerId: currentUser.id
+      }
+    });
+
+    res.json({ Spots: spots})
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching spots for current User" });
   }
 });
 
