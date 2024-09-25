@@ -1,6 +1,6 @@
 const express = require("express");
 const app = express();
-const spotImage = require("../../db/models/spotimage.js");
+const spotImage = require("../../db/models");
 const { requireAuth } = require("../../utils/auth.js");
 const router = express.Router();
 
