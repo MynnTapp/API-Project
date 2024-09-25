@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Spot } = require("../../db/models");
+const { Spot, Review, SpotImage } = require("../../db/models");
 
 const { requireAuth } = require("../../utils/auth.js");
 
@@ -53,12 +53,33 @@ router.get("/", async (req, res) => {
 router.get("/current", requireAuth, async (req, res) => {
   try {
     const currentUser = req.user;
-    console.log(currentUser);
 
     const spots = await Spot.findAll({
       where: {
         ownerId: currentUser.id
-      }
+      },
+      include: [
+        {
+          model: Review,
+          // attributes: []
+        },
+        {
+          model: SpotImage,
+          // as: 'previewImage',
+          attributes: ['url'],
+          where: {
+            preview: true
+          }
+        }
+      ],
+      // attributes: {
+      //   include: [
+      //     [
+      //       Sequelize.fn("AVG", Sequelize.col("Reviews.stars")),
+      //       "avgRating"
+      //     ]
+      //   ]
+      // }
     });
 
     res.json({ Spots: spots})
