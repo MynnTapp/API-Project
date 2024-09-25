@@ -42,9 +42,7 @@ router.post("/", requireAuth, async (req, res) => {
 
 router.get("/", async (req, res) => {
   try {
-    const spots = await Spot.findAll({
-      attributes: ["id", "ownerId", "address", "city", "state", "country", "lat", "lng", "name", "description", "price", "createdAt", "updatedAt", "previewImage", "avgRating"],
-    });
+    const spots = await Spot.findAll();
 
     res.json(spots);
   } catch (err) {
@@ -142,45 +140,6 @@ router.get("/:id", async (req, res) => {
       return res.status(404).json({ message: "Spot not found" });
     }
 
-    const numReviews = await Review.count({ where: { spotId } });
-    const avgStarRating = await Review.average("starRating", { where: { spotId } });
-
-    spot.dataValues.numReviews = numReviews;
-    spot.dataValues.avgStarRating = avgStarRating;
-
-    res.json(spot);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching spot" });
-  }
-});
-
-router.get("/:id", async (req, res) => {
-  try {
-    const spotId = req.params.id;
-    const spot = await Spot.findByPk(spotId, {
-      attributes: ["id", "ownerId", "address", "city", "state", "country", "lat", "lng", "name", "description", "price", "createdAt", "updatedAt"],
-      include: [
-        {
-          model: SpotImage,
-          attributes: ["id", "url", "preview"],
-        },
-        {
-          model: Owner,
-          attributes: ["id", "firstName", "lastName"],
-        },
-      ],
-    });
-
-    if (!spot) {
-      return res.status(404).json({ message: "Spot not found" });
-    }
-
-    const numReviews = await Review.count({ where: { spotId } });
-    const avgStarRating = await Review.average("starRating", { where: { spotId } });
-
-    spot.dataValues.numReviews = numReviews;
-    spot.dataValues.avgStarRating = avgStarRating;
-
     res.json(spot);
   } catch (err) {
     res.status(500).json({ message: "Error fetching spot" });
@@ -192,7 +151,7 @@ router.get("/spots/:userId", requireAuth, async (req, res) => {
     const userId = req.user.id;
     const spots = await Spot.findAll({
       where: { ownerId: userId },
-      attributes: ["id", "ownerId", "address", "city", "state", "country", "lat", "lng", "name", "description", "price", "createdAt", "updatedAt", "previewImage"],
+      attributes: ["id", "ownerId", "address", "city", "state", "country", "lat", "lng", "name", "description", "price", "createdAt", "updatedAt"],
       include: [
         {
           model: Review,
