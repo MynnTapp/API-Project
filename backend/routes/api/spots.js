@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Spot, Review, SpotImage } = require("../../db/models");
+const { Sequelize } = require('sequelize');
 
 const { requireAuth } = require("../../utils/auth.js");
 
@@ -61,28 +62,35 @@ router.get("/current", requireAuth, async (req, res) => {
       include: [
         {
           model: Review,
-          // attributes: []
+          attributes: []
         },
         {
           model: SpotImage,
-          // as: 'previewImage',
+          as: 'previewImage',
           attributes: ['url'],
           where: {
             preview: true
-          }
+          },
+          required: false
         }
       ],
-      // attributes: {
-      //   include: [
-      //     [
-      //       Sequelize.fn("AVG", Sequelize.col("Reviews.stars")),
-      //       "avgRating"
-      //     ]
-      //   ]
-      // }
+      attributes: {
+        include: [
+          [
+            Sequelize.fn("AVG", Sequelize.col("Reviews.stars")),
+            "avgRating"
+          ],
+        ]
+      },
+      group: ['Spot.id', 'previewImage.id']
     });
 
-    res.json({ Spots: spots})
+    const formattedSpots = spots.map(spot => {
+      spot.previewImage = (spot.previewImage[0].dataValues.url);
+      return spot
+    });
+
+    res.json({ Spots: formattedSpots})
   } catch (err) {
     res.status(500).json({ message: "Error fetching spots for current User" });
   }
