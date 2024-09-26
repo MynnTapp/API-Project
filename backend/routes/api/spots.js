@@ -123,7 +123,7 @@ router.get("/", async (req, res) => {
       ],
       limit,
       offset,
-      group: ["Spot.id"], // Removed "SpotImages.url"
+      group: ["Spot.id"],
       subQuery: false,
     });
 
@@ -242,9 +242,11 @@ router.get("/current", requireAuth, async (req, res) => {
         },
       ],
       group: ["Spot.id"], // Group only by Spot ID
+      group: ["Spot.id"],
     });
 
-    // Format the results
+    console.log(spots);
+
     const formattedSpots = spots.map((spot) => {
       const spotData = spot.toJSON();
       spotData.previewImage = spotData.SpotImages.length > 0 ? spotData.SpotImages[0].url : null;
