@@ -17,12 +17,12 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       Spot.hasMany(models.SpotImage, {
-        as: 'previewImage',
         foreignKey: 'spotId',
         onDelete: 'CASCADE'
       });
 
       Spot.belongsTo(models.User, {
+        as: 'Owner',
         foreignKey: 'ownerId'
       });
     }
