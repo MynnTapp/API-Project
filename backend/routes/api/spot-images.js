@@ -1,41 +1,36 @@
 const express = require("express");
-const app = express();
-const authMiddleware = require("../utils/auth");
-const spotImage = require("../models/SpotImages");
+const { SpotImage, Spot } = require("../../db/models");
+const { requireAuth } = require("../../utils/auth.js");
+const router = express.Router();
 
-router.use(authMiddleware.authenticate);
+router.delete("/:imageId", requireAuth, async (req, res) => {
+  const imageId = req.params.imageId;
+  const userId = req.user.id;
 
-app.post("/api/spots/:spotId/images", requireAuth, (res, req) => {
-  const spotId = req.params.spotId;
-  const image = req.body;
-  const db = req.db;
-  db.collection("spots").updateOne(
-    { _id: spotId },
-    {
-      $push: {
-        images: image,
-      },
+  const spotImage = await SpotImage.findByPk(imageId);
+
+  if (!spotImage) {
+    return res.status(404).json({ message: "Spot Image couldn't be found" });
+  }
+
+  const spot = await Spot.findOne({
+    where: {
+      id: spotImage.spotId,
     },
-    (err) => {
-      if (err) {
-        res.status(500).send({ message: "Error updating spot" });
-      } else {
-        res.send({ message: "Spot updated successfully" });
-      }
-    }
-  );
+    attributes: ["id", "ownerId"],
+  });
+
+  if (userId !== spot.ownerId) {
+    return res.status(403).json({ message: "Unauthorized to delete this image" });
+  }
+
+  try {
+    await spotImage.destroy();
+
+    res.status(200).json({ message: "Successfully deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting SpotImage" });
+  }
 });
 
-app.delete("/api/spots/:spotId/images", async (req, res) => {
-  const spotId = req.params.spotId;
-  const findSpot = await spotImage.findbypk(spotId);
-  if (!findSpot) {
-    return res.status(404).send({ message: "Spot image not found" });
-  }
-  const imageId = req.body.imageId;
-  const deleteImage = await spotImage.deleteImage(spotId, imageId);
-  if (!deleteImage) {
-    return res.status(404).send({ message: "Spot image not found" });
-  }
-  res.send({ message: "Spot image deleted successfully" });
-});
+module.exports = router;

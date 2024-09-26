@@ -5,7 +5,7 @@ const { Review, ReviewImage } = require('../../db/models');
 const { requireAuth } = require('../../utils/auth');
 
 // Delete a Review Image
-router.delete('/reviews-images/:imageId', requireAuth, async (req, res) => {
+router.delete('/:imageId', requireAuth, async (req, res) => {
     const imageId = req.params.imageId; 
 
     try {
@@ -20,7 +20,6 @@ router.delete('/reviews-images/:imageId', requireAuth, async (req, res) => {
         if(!review || review.userId !== req.user.id) {
             return res.status(403).json({ message: "User is not authorized to delete this review image" });
         }
-
         await reviewImage.destroy();
 
         res.status(200).json({ message: "Successfully deleted" });

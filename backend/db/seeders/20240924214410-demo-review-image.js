@@ -1,6 +1,6 @@
 "use strict";
 
-const { Review } = require("../models");
+const { ReviewImage } = require("../models");
 
 let options = {};
 if (process.env.NODE_ENV === "production") {
@@ -19,37 +19,27 @@ module.exports = {
      *   isBetaMember: false
      * }], {});
      */
-    await Review.bulkCreate(
+    await ReviewImage.bulkCreate(
       [
         {
-          userId: 1,
-          spotId: 1,
-          review: "This was an awesome spot!",
-          stars: 5,
+          reviewId: 1,
+          url: "Image.png",
         },
         {
-          userId: 1,
-          spotId: 2,
-          review: "Terrible!",
-          stars: 1,
+          reviewId: 2,
+          url: "Image.png",
         },
         {
-          userId: 1,
-          spotId: 3,
-          review: "It was alright.",
-          stars: 3,
+          reviewId: 3,
+          url: "Image.png",
         },
         {
-          userId: 2,
-          spotId: 1,
-          review: "Very unclean.",
-          stars: 2,
+          reviewId: 4,
+          url: "Image.png",
         },
         {
-          userId: 3,
-          spotId: 1,
-          review: "Nice trip!",
-          stars: 4,
+          reviewId: 5,
+          url: "Image.png",
         },
       ],
       { validate: true }
@@ -63,7 +53,7 @@ module.exports = {
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
      */
-    options.tableName = "Reviews";
-    return queryInterface.bulkDelete(options, {}, {});
+    options.tableName = "ReviewImages";
+    await queryInterface.bulkDelete(options, {}, {});
   },
 };

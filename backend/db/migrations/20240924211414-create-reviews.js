@@ -29,11 +29,11 @@ module.exports = {
         },
         onDelete: "CASCADE",
       },
-      rating: {
-        type: Sequelize.INTEGER,
+      review: {
+        type: Sequelize.STRING,
       },
-      comment: {
-        type: Sequelize.TEXT,
+      stars: {
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,

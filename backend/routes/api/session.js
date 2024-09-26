@@ -16,11 +16,14 @@ const validateLogin = [
 ];
 
 // Restore session user
-router.get("/", (req, res) => {
-  const { User } = req;
+router.get("/", restoreUser, (req, res) => {
+  const User = req.user.dataValues;
+
   if (User) {
     const safeUser = {
       id: User.id,
+      firstName: User.firstName,
+      lastName: User.lastName,
       email: User.email,
       username: User.username,
     };
@@ -44,10 +47,10 @@ router.post("/", validateLogin, async (req, res, next) => {
   });
 
   if (!user || !bcrypt.compareSync(password, user.hashedPassword.toString())) {
-    const err = new Error("Login failed");
+    const err = new Error("Invalid credentials");
     err.status = 401;
-    err.title = "Login failed";
-    err.errors = { credential: "The provided credentials were invalid." };
+    // err.title = "Login failed";
+    // err.errors = { credential: "The provided credentials were invalid." };
     return next(err);
   }
 

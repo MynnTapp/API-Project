@@ -15,19 +15,37 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      spotId: {
+        type: Sequelize.INTEGER,
+      },
+      ownerId: {
+        type: Sequelize.INTEGER,
+      },
+      address: {
+        type: Sequelize.STRING,
+      },
+      city: {
+        type: Sequelize.STRING,
+      },
+      state: {
+        type: Sequelize.STRING,
+      },
+      country: {
+        type: Sequelize.STRING,
+      },
+      lat: {
+        type: Sequelize.DECIMAL,
+      },
+      lng: {
+        type: Sequelize.DECIMAL,
+      },
       name: {
         type: Sequelize.STRING,
       },
       description: {
         type: Sequelize.TEXT,
       },
-      address: {
-        type: Sequelize.STRING,
-      },
-      latitude: {
-        type: Sequelize.DECIMAL,
-      },
-      longitude: {
+      price: {
         type: Sequelize.DECIMAL,
       },
       createdAt: {
