@@ -3,7 +3,7 @@ const router = express.Router();
 const { Spot, Review, SpotImage } = require("../../db/models");
 const { Sequelize } = require('sequelize');
 
-const { requireAuth } = require("../../utils/auth.js");
+const { setTokenCookie, requireAuth } = require("../../utils/auth.js");
 
 router.post("/", requireAuth, async (req, res) => {
   try {
@@ -45,10 +45,45 @@ router.get("/", async (req, res) => {
   try {
     const spots = await Spot.findAll();
 
-    res.json({"Spots": spots});
+    res.json({ Spots: spots });
   } catch (err) {
     res.status(500).json({ message: "Error fetching spots" });
   }
+});
+
+router.post("/:spotId/images", async (req, res) => {
+  const { url, preview } = req.body;
+
+  const spotId = req.params.spotId;
+
+  try {
+    // Find the spot by its primary key (ID)
+    const spot = await Spot.findByPk(spotId);
+    if (!spot) {
+      return res.status(400).json({ message: "Spot can't be found" });
+    }
+
+    // Check if the current user owns the spot
+    // if (spot.ownerId !== req.user.id) {
+    //   return res.status(403).json({ message: "User is not authorized to add an image to this spot" });
+    // }
+    const imageData = await SpotImage.create({ url, preview, spotId });
+    // Create the image associated with the spot
+
+    // Return the newly created image data
+    res.status(201).json(imageData);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "An error occurred while uploading the image" });
+  }
+
+  // if (spot.userId === req.user.id) {
+  //   const newSpotImage = await SpotImage.create({ spotId, url, preview });
+
+  //   return res.status(201).json(newSpotImage);
+  // }
+
+  // return res.status(404).json({ message: "Spot couldn't be found" });
 });
 
 router.get("/current", requireAuth, async (req, res) => {
@@ -57,7 +92,7 @@ router.get("/current", requireAuth, async (req, res) => {
 
     const spots = await Spot.findAll({
       where: {
-        ownerId: currentUser.id
+        ownerId: currentUser.id,
       },
       include: [
         {
