@@ -556,15 +556,15 @@ router.get('/:spotId/bookings', requireAuth, async (req, res) => {
 router.post('/:spotId/bookings', requireAuth, async (req, res) => {
   const { startDate, endDate } = req.body;
   const spotId = req.params.spotId;
-  const userId = req.user.id;
+  const userId = parseInt(req.user.id);
 
   const errors = {};
 
   const spot = await Spot.findOne({
     where: {
-      spotId
+      id: spotId
     },
-    attributes: ['id', 'ownerid']
+    attributes: ['id', 'ownerId']
   });
 
   if(!spot) {
@@ -640,7 +640,15 @@ router.post('/:spotId/bookings', requireAuth, async (req, res) => {
     endDate
   });
 
-  res.status(201).json({ newBooking })
+  res.status(201).json({ 
+    id: newBooking.id,
+    spotId: newBooking.spotId,
+    userId: newBooking.userId,
+    startDate: newBooking.startDate,
+    endDate: newBooking.endDate,
+    createdAt: newBooking.createdAt,
+    updatedAt: newBooking.updatedAt
+   })
 });
 
 module.exports = router;

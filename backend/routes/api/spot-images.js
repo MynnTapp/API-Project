@@ -1,21 +1,36 @@
 const express = require("express");
-const { SpotImage } = require("../../db/models");
+const { SpotImage, Spot } = require("../../db/models");
 const { requireAuth } = require("../../utils/auth.js");
 const router = express.Router();
-const { Spot } = require("../../db/models");
 
-router.delete("spots/:spotId/images", async (req, res) => {
-  const spotId = req.params.spotId;
-  const findSpot = await spotImage.findbypk(spotId);
-  if (!findSpot) {
-    return res.status(404).send({ message: "Spot image not found" });
+router.delete("/:imageId", requireAuth, async (req, res) => {
+  const imageId = req.params.imageId;
+  const userId = req.user.id;
+
+  const spotImage = await SpotImage.findByPk(imageId);
+
+  if(!spotImage) {
+    return res.status(404).json({ message: "Spot Image couldn't be found" });
   }
-  const imageId = req.body.imageId;
-  const deleteImage = await spotImage.deleteImage(spotId, imageId);
-  if (!deleteImage) {
-    return res.status(404).send({ message: "Spot image not found" });
+
+  const spot = await Spot.findOne({
+    where: {
+      id: spotImage.spotId
+    },
+    attributes: ['id', 'ownerId']
+  });
+
+  if(userId !== spot.ownerId) {
+    return res.status(403).json({ message: "Unauthorized to delete this image" });
   }
-  res.send({ message: "Spot image deleted successfully" });
+
+  try {
+    await spotImage.destroy();
+
+    res.json({ message: "Successfully deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Error deleting SpotImage" });
+  }
 });
 
 module.exports = router;
