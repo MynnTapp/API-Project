@@ -1,31 +1,10 @@
 const express = require("express");
-const app = express();
-const spotImage = require("../../db/models");
+const { SpotImage } = require("../../db/models");
 const { requireAuth } = require("../../utils/auth.js");
 const router = express.Router();
+const { Spot } = require("../../db/models");
 
-app.post("/spots/:spotId/images", requireAuth, (res, req) => {
-  const spotId = req.params.spotId;
-  const image = req.body;
-  const db = req.db;
-  db.collection("spots").updateOne(
-    { _id: spotId },
-    {
-      $push: {
-        images: image,
-      },
-    },
-    (err) => {
-      if (err) {
-        res.status(500).send({ message: "Error updating spot" });
-      } else {
-        res.send({ message: "Spot updated successfully" });
-      }
-    }
-  );
-});
-
-app.delete("spots/:spotId/images", async (req, res) => {
+router.delete("spots/:spotId/images", async (req, res) => {
   const spotId = req.params.spotId;
   const findSpot = await spotImage.findbypk(spotId);
   if (!findSpot) {
