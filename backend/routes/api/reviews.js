@@ -174,6 +174,10 @@ router.post('/:reviewId/images', requireAuth, async (req, res) => {
             url
         });
 
+        delete newImage.dataValues.reviewId;
+        delete newImage.dataValues.createdAt;
+        delete newImage.dataValues.updatedAt;
+
         res.status(201).json(newImage);
     } catch (err) {
         res.status(500).json({ message: "An error occurred while uploading the image" });
@@ -181,18 +185,18 @@ router.post('/:reviewId/images', requireAuth, async (req, res) => {
 });
 
 // Edit a Review
-router.put('reviews/:reviewId', requireAuth, async (req, res) => {
+router.put('/:reviewId', requireAuth, async (req, res) => {
     const { review, stars } = req.body;
     const reviewId = req.params.reviewId;
 
     const errors = {};
 
     if(!review) {
-        errors.review({ message: "Review text is required" });
+        errors.review = "Review text is required";
     }
 
     if(stars === undefined || stars < 1 || stars > 5) {
-        errors.stars({ message: "Stars must be an integer from 1 to 5" });
+        errors.stars = "Stars must be an integer from 1 to 5";
     }
 
     if(Object.keys(errors).length > 0) {
@@ -225,14 +229,14 @@ router.put('reviews/:reviewId', requireAuth, async (req, res) => {
 });
 
 // Delete a Review
-router.delete('/reviews/:reviewId', requireAuth, async (req, res) => {
+router.delete('/:reviewId', requireAuth, async (req, res) => {
     const reviewId = req.params.reviewId;
 
     try {
         const review = await Review.findByPk(reviewId);
 
         if(!review) {
-            return res.status(404).jjson({ message: "Review couldn't be found" });
+            return res.status(404).json({ message: "Review couldn't be found" });
         }
 
         if(review.userId !== req.user.id) {
@@ -243,7 +247,7 @@ router.delete('/reviews/:reviewId', requireAuth, async (req, res) => {
 
         res.status(200).json({ message: "Successfully deleted" });
     } catch (err) {
-        res.status(500).json({ message: "An error occurred while deleting teh review" });
+        res.status(500).json({ message: "An error occurred while deleting the review" });
     }
 });
 

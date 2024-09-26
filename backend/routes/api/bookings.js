@@ -1,8 +1,53 @@
 const express = require("express");
 const router = express.Router();
-const bookings = require("../../db/models/booking.js");
+const { Booking, Spot, SpotImage } = require('../../db/models');
 const { requireAuth } = require("../../utils/auth");
-const spots = require("../../db/models/spot.js");
+
+// GET all of the current User's Bookings
+router.get('/current/', requireAuth, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const bookings = await Booking.findAll({
+      where: {
+        userId
+      },
+      include: [
+        {
+          model: Spot,
+          attributes: ['id', 'ownerId', 'address', 'city', 'state', 'country',
+            'lat', 'lng', 'name', 'price'
+          ],
+          include: [
+            {
+              model: SpotImage,
+              where: {
+                preview: true
+              },
+              attributes: ['url']
+            }
+          ]
+        },
+      ]
+    });
+  
+    const formattedBookings = bookings.map(booking => {
+      const bookingData = booking.toJSON();
+  
+      bookingData.Spot.previewImage = bookingData.Spot.SpotImages.length > 0
+        ? bookingData.Spot.SpotImages[0].url
+        : null;
+      
+      delete bookingData.Spot.SpotImages;
+  
+      return bookingData;
+    });
+  
+    res.json({ Booking: formattedBookings });
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching all Bookings from current User" });
+  }
+});
 
 router.get("/:spotsid", requireAuth, async (req, res) => {
   const spotId = req.params.spotsid;
