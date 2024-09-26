@@ -205,7 +205,7 @@ router.post("/:spotId/images", requireAuth, async (req, res) => {
 // GET all Spots of current User
 router.get("/current", requireAuth, async (req, res) => {
   try {
-    const currentUser = parseInt(req.user.dataValues.id);
+    const currentUser = req.user.id; // Assuming req.user.id is available
 
     const spots = await Spot.findAll({
       where: {
@@ -238,18 +238,17 @@ router.get("/current", requireAuth, async (req, res) => {
             preview: true,
           },
           attributes: ["url"],
+          required: false, // Allow spots without preview images
         },
       ],
-      group: ["Spot.id", "SpotImages.url"],
+      group: ["Spot.id"], // Group only by Spot ID
     });
 
+    // Format the results
     const formattedSpots = spots.map((spot) => {
       const spotData = spot.toJSON();
-
       spotData.previewImage = spotData.SpotImages.length > 0 ? spotData.SpotImages[0].url : null;
-
       delete spotData.SpotImages;
-
       return spotData;
     });
 
