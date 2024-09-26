@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Spot, Review, ReviewImage, SpotImage, User, Booking } = require("../../db/models");
 const { Sequelize, Op } = require('sequelize');
+const { check } = require('express-validator');
 const { handleValidationErrors } = require("../../utils/validation");
 
 const { setTokenCookie, requireAuth } = require("../../utils/auth.js");
@@ -11,7 +12,8 @@ const ValidateSpotEdit = [
   check("city").exists({ checkFalsy: true }).withMessage("City is required"),
   check("state").exists({ checkFalsy: true }).withMessage("State is required"),
   check("country").exists({ checkFalsy: true }).withMessage("Country is required"),
-  check("lat").exists({ checkFalsy: true }).isNumeric().withMessage("Latitude is not valid").check("lng").exists({ checkFalsy: true }).isNumeric().withMessage("Longitude is not valid"),
+  check("lat").exists({ checkFalsy: true }).isNumeric().withMessage("Latitude is not valid"),
+  check("lng").exists({ checkFalsy: true }).isNumeric().withMessage("Longitude is not valid"),
   handleValidationErrors,
 ];
 
@@ -237,16 +239,10 @@ router.get("/current", requireAuth, async (req, res) => {
           where: {
             preview: true,
           },
-<<<<<<< HEAD
           attributes: ['url']
         }
       ],
       group: ['Spot.id', 'SpotImages.url']
-=======
-          attributes: ["url"],
-        },
-      ],
->>>>>>> f5d24df4d68d47e60dd527d7a584a34697a9529c
     });
 
     const formattedSpots = spots.map((spot) => {
@@ -375,7 +371,6 @@ router.get("/:spotId", requireAuth, async (req, res) => {
         },
         {
           model: Review,
-<<<<<<< HEAD
           attributes: []
         }
       ],
@@ -383,18 +378,6 @@ router.get("/:spotId", requireAuth, async (req, res) => {
     });
 
     if(!spot.dataValues.id) {
-=======
-          attributes: [],
-        },
-      ],
-    });
-
-    console.log("TESTING HERE");
-    console.log(spot);
-    console.log("TESTING ENDS");
-
-    if (!spot.dataValues.id) {
->>>>>>> f5d24df4d68d47e60dd527d7a584a34697a9529c
       return res.status(404).json({ message: "Spot couldn't be found" });
     }
 
