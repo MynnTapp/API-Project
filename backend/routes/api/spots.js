@@ -120,7 +120,7 @@ router.get("/", async (req, res) => {
       ],
       limit,
       offset,
-      group: ['Spot.id', 'SpotImages.url'],
+      group: ['Spot.id'],
       subQuery: false
     });
 
@@ -242,8 +242,10 @@ router.get("/current", requireAuth, async (req, res) => {
           attributes: ['url']
         }
       ],
-      group: ['Spot.id', 'SpotImages.url']
+      group: ['Spot.id']
     });
+
+    console.log(spots);
 
     const formattedSpots = spots.map((spot) => {
       const spotData = spot.toJSON();
