@@ -7,38 +7,42 @@ if (process.env.NODE_ENV === "production") {
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable("SpotImages", {
-      id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
-      spotId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: "Spots",
-          key: "id",
+    await queryInterface.createTable(
+      "SpotImages",
+      {
+        id: {
+          allowNull: false,
+          autoIncrement: true,
+          primaryKey: true,
+          type: Sequelize.INTEGER,
         },
-        onDelete: "CASCADE",
+        spotId: {
+          type: Sequelize.INTEGER,
+          references: {
+            model: "Spots",
+            key: "id",
+          },
+          onDelete: "CASCADE",
+        },
+        url: {
+          type: Sequelize.STRING,
+        },
+        preview: {
+          type: Sequelize.BOOLEAN,
+        },
+        createdAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        },
+        updatedAt: {
+          allowNull: false,
+          type: Sequelize.DATE,
+          defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
+        },
       },
-      url: {
-        type: Sequelize.STRING,
-      },
-      preview: {
-        type: Sequelize.BOOLEAN,
-      },
-      createdAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
-      },
-      updatedAt: {
-        allowNull: false,
-        type: Sequelize.DATE,
-        defaultValue: Sequelize.literal("CURRENT_TIMESTAMP"),
-      },
-    });
+      options
+    );
 
     /**
      * Add altering commands here.
