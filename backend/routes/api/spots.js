@@ -201,50 +201,113 @@ router.post("/", requireAuth, async (req, res) => {
 //   }
 // });
 
-router.get("/", async (req, res) => {
-  const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
+// router.get("/", async (req, res) => {
+//   const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
-  let errors = {};
+//   let errors = {};
 
-  // Parse latitude and longitude as numbers
-  const parsedMinLat = minLat ? parseFloat(minLat) : undefined;
-  const parsedMaxLat = maxLat ? parseFloat(maxLat) : undefined;
-  const parsedMinLng = minLng ? parseFloat(minLng) : undefined;
-  const parsedMaxLng = maxLng ? parseFloat(maxLng) : undefined;
+//   // Parse latitude and longitude as numbers
+//   const parsedMinLat = minLat ? parseFloat(minLat) : undefined;
+//   const parsedMaxLat = maxLat ? parseFloat(maxLat) : undefined;
+//   const parsedMinLng = minLng ? parseFloat(minLng) : undefined;
+//   const parsedMaxLng = maxLng ? parseFloat(maxLng) : undefined;
 
-  // Validation
-  if (page < 1) errors.page = "Page must be greater than or equal to 1";
-  if (size < 1 || size > 20) errors.size = "Size must be between 1 and 20";
-  if (parsedMinLat && isNaN(parsedMinLat)) errors.minLat = "Minimum latitude is invalid";
-  if (parsedMaxLat && isNaN(parsedMaxLat)) errors.maxLat = "Maximum latitude is invalid";
-  if (parsedMinLng && isNaN(parsedMinLng)) errors.minLng = "Minimum longitude is invalid";
-  if (parsedMaxLng && isNaN(parsedMaxLng)) errors.maxLng = "Maximum longitude is invalid";
-  if (minPrice && (isNaN(minPrice) || minPrice < 0)) errors.minPrice = "Minimum price must be greater than or equal to 0";
-  if (maxPrice && (isNaN(maxPrice) || maxPrice < 0)) errors.maxPrice = "Maximum price must be greater than or equal to 0";
+//   // Validation
+//   if (page < 1) errors.page = "Page must be greater than or equal to 1";
+//   if (size < 1 || size > 20) errors.size = "Size must be between 1 and 20";
+//   if (parsedMinLat && isNaN(parsedMinLat)) errors.minLat = "Minimum latitude is invalid";
+//   if (parsedMaxLat && isNaN(parsedMaxLat)) errors.maxLat = "Maximum latitude is invalid";
+//   if (parsedMinLng && isNaN(parsedMinLng)) errors.minLng = "Minimum longitude is invalid";
+//   if (parsedMaxLng && isNaN(parsedMaxLng)) errors.maxLng = "Maximum longitude is invalid";
+//   if (minPrice && (isNaN(minPrice) || minPrice < 0)) errors.minPrice = "Minimum price must be greater than or equal to 0";
+//   if (maxPrice && (isNaN(maxPrice) || maxPrice < 0)) errors.maxPrice = "Maximum price must be greater than or equal to 0";
 
-  if (Object.keys(errors).length > 0) {
-    return res.status(400).json({
-      message: "Bad request",
-      errors,
-    });
-  }
+//   if (Object.keys(errors).length > 0) {
+//     return res.status(400).json({
+//       message: "Bad request",
+//       errors,
+//     });
+//   }
 
-  const limit = parseInt(size);
-  const offset = limit * (parseInt(page) - 1);
+//   const limit = parseInt(size);
+//   const offset = limit * (parseInt(page) - 1);
 
-  let where = {};
+//   let where = {};
 
-  // Use parsed values for latitude and longitude filters
-  if (parsedMinLat) where.lat = { [Op.gte]: parsedMinLat };
-  if (parsedMaxLat) where.lat = { ...where.lat, [Op.lte]: parsedMaxLat };
-  if (parsedMinLng) where.lng = { [Op.gte]: parsedMinLng };
-  if (parsedMaxLng) where.lng = { ...where.lng, [Op.lte]: parsedMaxLng };
-  if (minPrice) where.price = { [Op.gte]: parseFloat(minPrice) };
-  if (maxPrice) where.price = { ...where.price, [Op.lte]: parseFloat(maxPrice) };
+//   // Use parsed values for latitude and longitude filters
+//   if (parsedMinLat) where.lat = { [Op.gte]: parsedMinLat };
+//   if (parsedMaxLat) where.lat = { ...where.lat, [Op.lte]: parsedMaxLat };
+//   if (parsedMinLng) where.lng = { [Op.gte]: parsedMinLng };
+//   if (parsedMaxLng) where.lng = { ...where.lng, [Op.lte]: parsedMaxLng };
+//   if (minPrice) where.price = { [Op.gte]: parseFloat(minPrice) };
+//   if (maxPrice) where.price = { ...where.price, [Op.lte]: parseFloat(maxPrice) };
 
+//   try {
+//     const spots = await Spot.findAll({
+//       where,
+//       attributes: [
+//         "id",
+//         "ownerId",
+//         "address",
+//         "city",
+//         "state",
+//         "country",
+//         "lat",
+//         "lng",
+//         "name",
+//         "description",
+//         "price",
+//         "createdAt",
+//         "updatedAt",
+//         [Sequelize.fn("AVG", Sequelize.col("Reviews.stars")), "avgRating"],
+//       ],
+//       include: [
+//         {
+//           model: Review,
+//           attributes: [], // Don't return reviews
+//         },
+//         {
+//           model: SpotImage,
+//           required: false, // Allow spots without preview images
+//           where: { preview: true },
+//           attributes: ["url"],
+//         },
+//       ],
+//       limit,
+//       offset,
+//       group: ["Spot.id"],
+//       subQuery: false,
+//     });
+
+//     const formattedSpots = spots.map((spot) => {
+//       const spotData = spot.toJSON();
+//       spotData.previewImage = spotData.SpotImages && spotData.SpotImages.length > 0 ? spotData.SpotImages[0].url : null;
+//       delete spotData.SpotImages;
+//       return spotData;
+//     });
+
+//     res.status(200).json({
+//       Spots: formattedSpots,
+//       page: parseInt(page),
+//       size: limit,
+//     });
+//   } catch (error) {
+//     console.error(error); // Log the error for debugging
+//     res.status(500).json({
+//       message: "Error fetching spots",
+//       error: error.message, // Return the error message
+//     });
+//   }
+// });
+
+router.get("/current", requireAuth, async (req, res) => {
   try {
+    const currentUser = req.user.id; // Assuming req.user.id is available
+
     const spots = await Spot.findAll({
-      where,
+      where: {
+        ownerId: currentUser,
+      },
       attributes: [
         "id",
         "ownerId",
@@ -264,39 +327,32 @@ router.get("/", async (req, res) => {
       include: [
         {
           model: Review,
-          attributes: [], // Don't return reviews
+          attributes: [], // No need to select any review attributes
         },
         {
           model: SpotImage,
+          where: {
+            preview: true,
+          },
+          attributes: ["id", "url"], // SpotImage attributes
           required: false, // Allow spots without preview images
-          where: { preview: true },
-          attributes: ["url"],
         },
       ],
-      limit,
-      offset,
-      group: ["Spot.id"],
-      subQuery: false,
+      group: ["Spot.id", "SpotImages.id"], // Include SpotImages.id in GROUP BY clause
     });
 
+    // Format the response
     const formattedSpots = spots.map((spot) => {
       const spotData = spot.toJSON();
-      spotData.previewImage = spotData.SpotImages && spotData.SpotImages.length > 0 ? spotData.SpotImages[0].url : null;
+      spotData.previewImage = spotData.SpotImages.length > 0 ? spotData.SpotImages[0].url : null;
       delete spotData.SpotImages;
       return spotData;
     });
 
-    res.status(200).json({
-      Spots: formattedSpots,
-      page: parseInt(page),
-      size: limit,
-    });
-  } catch (error) {
-    console.error(error); // Log the error for debugging
-    res.status(500).json({
-      message: "Error fetching spots",
-      error: error.message, // Return the error message
-    });
+    res.status(200).json({ Spots: formattedSpots });
+  } catch (err) {
+    console.error(err); // Log the error for debugging
+    res.status(500).json({ message: "Error fetching spots", error: err.message });
   }
 });
 
