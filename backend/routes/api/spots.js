@@ -58,6 +58,7 @@ router.post("/", requireAuth, async (req, res) => {
 
 // GET all Spots
 // Add Query Filters to GET all Spots
+// GET all Spots
 router.get("/", async (req, res) => {
   const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
@@ -127,6 +128,14 @@ router.get("/", async (req, res) => {
       subQuery: false,
     });
 
+    if (spots.length === 0) {
+      return res.status(200).json({
+        Spots: [],
+        page: parseInt(page),
+        size: limit,
+      });
+    }
+
     const formattedSpots = spots.map((spot) => {
       const spotData = spot.toJSON();
       spotData.previewImage = spotData.SpotImages && spotData.SpotImages.length > 0 ? spotData.SpotImages[0].url : null;
@@ -134,14 +143,17 @@ router.get("/", async (req, res) => {
       return spotData;
     });
 
-    res.json({
+    res.status(200).json({
       Spots: formattedSpots,
       page: parseInt(page),
       size: limit,
     });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Error fetching spots" });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({
+      message: "Error fetching spots",
+      error: error.message, // Return the error message
+    });
   }
 });
 
