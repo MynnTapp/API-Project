@@ -11,7 +11,7 @@ const routes = require("./routes");
 const { environment } = require("./config");
 const isProduction = environment === "production";
 const { ValidationError } = require("sequelize");
-const csrfRouter = require("backend/routes/index.js");
+const csrfRouter = require("../backend/routes/index");
 
 app.use(morgan("dev"));
 app.use(cookieParser());
