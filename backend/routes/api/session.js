@@ -10,7 +10,7 @@ const router = express.Router();
 
 // Middleware
 const validateLogin = [
-  check("credential").exists({ checkFalsy: true }).notEmpty().withMessage("Email or username is required"),
+  check("credential").exists({ checkFalsy: true }).withMessage("Email or username is required"),
   check("password").exists({ checkFalsy: true }).withMessage("Password is required"),
   handleValidationErrors,
 ];
@@ -51,41 +51,49 @@ router.get("/", restoreUser, (req, res) => {
 });
 
 // Log in
+// Log in
 router.post("/", validateLogin, async (req, res, next) => {
-  const { credential, password } = req.body;
+  try {
+    const { credential, password } = req.body;
 
-  const user = await User.unscoped().findOne({
-    where: {
-      [Op.or]: {
-        username: credential,
-        email: credential,
+    const user = await User.unscoped().findOne({
+      where: {
+        [Op.or]: {
+          username: credential,
+          email: credential,
+        },
       },
-    },
-  });
+    });
 
-  if (!user || !bcrypt.compareSync(password, user.hashedPassword.toString())) {
-    const err = new Error("Invalid credentials");
-    err.status = 401;
-    // err.title = "Login failed";
-    // err.errors = { credential: "The provided credentials were invalid." };
-    return next(err);
+    if (!user || !bcrypt.compareSync(password, user.hashedPassword.toString())) {
+      const err = new Error("Invalid credentials");
+      err.status = 401;
+      err.title = "Login failed";
+      err.errors = { credential: "Invalid credentials" };
+      return next(err);
+    }
+
+    const safeUser = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      username: user.username,
+    };
+
+    await setTokenCookie(res, safeUser);
+
+    return res.json({
+      user: safeUser,
+    });
+  } catch (error) {
+    console.error(error); // Log the error for debugging
+    res.status(500).json({
+      message: "Error logging in",
+      error: error.message, // Return the error message
+    });
   }
-
-  const safeUser = {
-    id: user.id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    username: user.username,
-  };
-
-  await setTokenCookie(res, safeUser);
-
-  return res.json({
-    user: safeUser,
-  });
 });
-
 // Log out
 router.delete("/", (_req, res) => {
   res.clearCookie("token");
