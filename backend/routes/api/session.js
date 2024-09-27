@@ -16,21 +16,38 @@ const validateLogin = [
 ];
 
 // Restore session user
-router.get("/", restoreUser, (req, res) => {
-  const User = req.user.dataValues;
+// router.get("/", restoreUser, (req, res) => {
+//   const User = req.user.dataValues;
 
-  if (User) {
-    const safeUser = {
-      id: User.id,
-      firstName: User.firstName,
-      lastName: User.lastName,
-      email: User.email,
-      username: User.username,
-    };
-    return res.json({
-      user: safeUser,
-    });
-  } else return res.json({ user: null });
+//   if (User) {
+//     const safeUser = {
+//       id: User.id,
+//       firstName: User.firstName,
+//       lastName: User.lastName,
+//       email: User.email,
+//       username: User.username,
+//     };
+//     return res.status.json({
+//       user: safeUser,
+//     });
+//   } else return res.status(200).json({ user: null });
+// });
+
+router.get("/", restoreUser, (req, res) => {
+  if (!req.user) {
+    return res.status(200).json({ user: null });
+  }
+  const User = req.user.dataValues;
+  const safeUser = {
+    id: User.id,
+    firstName: User.firstName,
+    lastName: User.lastName,
+    email: User.email,
+    username: User.username,
+  };
+  return res.status(200).json({
+    user: safeUser,
+  });
 });
 
 // Log in
