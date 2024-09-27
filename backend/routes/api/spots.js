@@ -158,7 +158,6 @@ router.post("/", requireAuth, async (req, res) => {
 // });
 
 // GET all Spots
-// GET all Spots
 router.get("/", async (req, res) => {
   const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
@@ -220,6 +219,7 @@ router.get("/", async (req, res) => {
           required: false, // Ensure spots without images are included
           where: { preview: true },
           attributes: ["url"],
+          subQuery: false,
         },
       ],
       limit,
@@ -244,6 +244,8 @@ router.get("/", async (req, res) => {
 
     res.status(200).json({
       Spots: formattedSpots,
+      page: parseInt(page),
+      size: limit,
     });
   } catch (error) {
     console.error(error); // Log the error for debugging
@@ -444,7 +446,6 @@ router.delete("/:id", requireAuth, async (req, res) => {
 
 // GET a Spot from an id
 // GET a Spot from an id
-// GET a Spot from an id
 router.get("/:spotId", async (req, res) => {
   try {
     const spotId = parseInt(req.params.spotId);
@@ -491,7 +492,7 @@ router.get("/:spotId", async (req, res) => {
       return res.status(404).json({ message: "Spot couldn't be found" });
     }
 
-    res.json({ Spot: spot });
+    res.status(200).json({ Spot: spot });
   } catch (error) {
     console.error(error); // Log the error for debugging
     res.status(500).json({
