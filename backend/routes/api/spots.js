@@ -300,7 +300,7 @@ router.post("/", requireAuth, async (req, res) => {
 //   }
 // });
 
-router.get("/current", requireAuth, async (req, res) => {
+router.get("/", requireAuth, async (req, res) => {
   try {
     const currentUser = req.user.id; // Assuming req.user.id is available
 
