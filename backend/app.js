@@ -11,10 +11,12 @@ const routes = require("./routes");
 const { environment } = require("./config");
 const isProduction = environment === "production";
 const { ValidationError } = require("sequelize");
+const csrfRouter = require("./index");
 
 app.use(morgan("dev"));
 app.use(cookieParser());
 app.use(express.json());
+app.use("/api", csrfRouter);
 
 // Security Middleware
 if (!isProduction) {
