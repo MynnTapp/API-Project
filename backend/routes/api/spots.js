@@ -325,7 +325,11 @@ router.get("/", requireAuth, async (req, res) => {
       });
     }
 
-    // // Parse latitude and longitude as numbers
+    // TEST
+    console.log("TEST");
+    console.log(errors);
+
+    // Parse latitude and longitude as numbers
     const parsedMinLat = minLat ? parseFloat(minLat) : undefined;
     const parsedMaxLat = maxLat ? parseFloat(maxLat) : undefined;
     const parsedMinLng = minLng ? parseFloat(minLng) : undefined;
@@ -337,7 +341,7 @@ router.get("/", requireAuth, async (req, res) => {
     let where = {};
     where.ownerId = currentUser;
 
-    // // Use parsed values for latitude and longitude filters
+    // Use parsed values for latitude and longitude filters
     if (parsedMinLat) where.lat = { [Op.gte]: parsedMinLat };
     if (parsedMaxLat) where.lat = { ...where.lat, [Op.lte]: parsedMaxLat };
     if (parsedMinLng) where.lng = { [Op.gte]: parsedMinLng };
