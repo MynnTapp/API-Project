@@ -333,8 +333,8 @@ router.get("/", requireAuth, async (req, res) => {
     // const parsedMinLng = minLng ? parseFloat(minLng) : undefined;
     // const parsedMaxLng = maxLng ? parseFloat(maxLng) : undefined;
 
-    const limit = parseInt(size);
-    const offset = limit * (parseInt(page) - 1);
+    // const limit = parseInt(size);
+    // const offset = limit * (parseInt(page) - 1);
 
     let where = {};
     where.ownerId = currentUser;
