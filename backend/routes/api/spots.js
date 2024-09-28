@@ -306,15 +306,13 @@ router.get("/", requireAuth, async (req, res) => {
 
     const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
-    // const { page = 1, size = 20 } = req.query;
-
     let errors = {};
     if (page < 1) errors.page = "Page must be greater than or equal to 1";
     if (size < 1 || size > 20) errors.size = "Size must be between 1 and 20";
-    if (minLat && isNaN(minLat) /*&& minLat >= -90 && minLat <= 90*/) errors.minLat = "Minimum latitude is invalid";
-    if (maxLat && isNaN(maxLat) /*&& maxLat >= -90 && maxLat <= 90*/) errors.maxLat = "Maximum latitude is invalid";
-    if (minLng && isNaN(minLng) /*&& minLng >= -180 && minLng <= 180*/) errors.minLng = "Minimum longitude is invalid";
-    if (maxLng && isNaN(maxLng) /*&& maxLng >= -180 && maxLng <= 180*/) errors.maxLng = "Maximum longitude is invalid";
+    // if (minLat && isNaN(minLat) /*&& minLat >= -90 && minLat <= 90*/) errors.minLat = "Minimum latitude is invalid";
+    // if (maxLat && isNaN(maxLat) /*&& maxLat >= -90 && maxLat <= 90*/) errors.maxLat = "Maximum latitude is invalid";
+    // if (minLng && isNaN(minLng) /*&& minLng >= -180 && minLng <= 180*/) errors.minLng = "Minimum longitude is invalid";
+    // if (maxLng && isNaN(maxLng) /*&& maxLng >= -180 && maxLng <= 180*/) errors.maxLng = "Maximum longitude is invalid";
     // if (minPrice && (isNaN(minPrice) || minPrice < 0)) errors.minPrice = "Minimum price must be greater than or equal to 0";
     // if (maxPrice && (isNaN(maxPrice) || maxPrice < 0)) errors.maxPrice = "Maximum price must be greater than or equal to 0";
 
@@ -325,15 +323,11 @@ router.get("/", requireAuth, async (req, res) => {
       });
     }
 
-    // TEST
-    console.log("TEST");
-    console.log(errors);
-
     // Parse latitude and longitude as numbers
-    const parsedMinLat = minLat ? parseFloat(minLat) : undefined;
-    const parsedMaxLat = maxLat ? parseFloat(maxLat) : undefined;
-    const parsedMinLng = minLng ? parseFloat(minLng) : undefined;
-    const parsedMaxLng = maxLng ? parseFloat(maxLng) : undefined;
+    // const parsedMinLat = minLat ? parseFloat(minLat) : undefined;
+    // const parsedMaxLat = maxLat ? parseFloat(maxLat) : undefined;
+    // const parsedMinLng = minLng ? parseFloat(minLng) : undefined;
+    // const parsedMaxLng = maxLng ? parseFloat(maxLng) : undefined;
 
     const limit = parseInt(size);
     const offset = limit * (parseInt(page) - 1);
@@ -342,10 +336,10 @@ router.get("/", requireAuth, async (req, res) => {
     where.ownerId = currentUser;
 
     // Use parsed values for latitude and longitude filters
-    if (parsedMinLat) where.lat = { [Op.gte]: parsedMinLat };
-    if (parsedMaxLat) where.lat = { ...where.lat, [Op.lte]: parsedMaxLat };
-    if (parsedMinLng) where.lng = { [Op.gte]: parsedMinLng };
-    if (parsedMaxLng) where.lng = { ...where.lng, [Op.lte]: parsedMaxLng };
+    // if (parsedMinLat) where.lat = { [Op.gte]: parsedMinLat };
+    // if (parsedMaxLat) where.lat = { ...where.lat, [Op.lte]: parsedMaxLat };
+    // if (parsedMinLng) where.lng = { [Op.gte]: parsedMinLng };
+    // if (parsedMaxLng) where.lng = { ...where.lng, [Op.lte]: parsedMaxLng };
     // if (minPrice) where.price = { [Op.gte]: parseFloat(minPrice) };
     // if (maxPrice) where.price = { ...where.price, [Op.lte]: parseFloat(maxPrice) };
 
