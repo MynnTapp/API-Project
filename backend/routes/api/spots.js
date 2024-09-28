@@ -305,6 +305,8 @@ router.get("/", requireAuth, async (req, res) => {
   try {
     const currentUser = req.user.id; // Assuming req.user.id is available
 
+    // const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
+
     const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
     // let errors = {};
