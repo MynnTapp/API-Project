@@ -301,14 +301,15 @@ router.post("/", requireAuth, async (req, res) => {
 // });
 
 router.get("/", requireAuth, async (req, res) => {
+  console.log("TEST");
   try {
     const currentUser = req.user.id; // Assuming req.user.id is available
 
     const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
-    let errors = {};
-    if (page < 1) errors.page = "Page must be greater than or equal to 1";
-    if (size < 1 || size > 20) errors.size = "Size must be between 1 and 20";
+    // let errors = {};
+    // if (page < 1) errors.page = "Page must be greater than or equal to 1";
+    // if (size < 1 || size > 20) errors.size = "Size must be between 1 and 20";
     // if (minLat && isNaN(minLat) /*&& minLat >= -90 && minLat <= 90*/) errors.minLat = "Minimum latitude is invalid";
     // if (maxLat && isNaN(maxLat) /*&& maxLat >= -90 && maxLat <= 90*/) errors.maxLat = "Maximum latitude is invalid";
     // if (minLng && isNaN(minLng) /*&& minLng >= -180 && minLng <= 180*/) errors.minLng = "Minimum longitude is invalid";
@@ -316,12 +317,15 @@ router.get("/", requireAuth, async (req, res) => {
     // if (minPrice && (isNaN(minPrice) || minPrice < 0)) errors.minPrice = "Minimum price must be greater than or equal to 0";
     // if (maxPrice && (isNaN(maxPrice) || maxPrice < 0)) errors.maxPrice = "Maximum price must be greater than or equal to 0";
 
-    if (Object.keys(errors).length > 0) {
-      return res.status(400).json({
-        message: "Bad Request",
-        errors,
-      });
-    }
+    // console.log(page);
+    // console.log(size);
+
+    // if (Object.keys(errors).length > 0) {
+    //   return res.status(400).json({
+    //     message: "Bad Request",
+    //     errors,
+    //   });
+    // }
 
     // Parse latitude and longitude as numbers
     // const parsedMinLat = minLat ? parseFloat(minLat) : undefined;
