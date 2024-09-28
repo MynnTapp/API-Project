@@ -304,8 +304,11 @@ router.get("/", requireAuth, async (req, res) => {
   try {
     const currentUser = req.user.id; // Assuming req.user.id is available
 
+    // const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
+
     const { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
 
+    // Convert size and page to integers to avoid string issues
     let errors = {};
     if (page < 1) errors.page = "Page must be greater than or equal to 1";
     if (size < 1 || size > 20) errors.size = "Size must be between 1 and 20";
@@ -329,7 +332,7 @@ router.get("/", requireAuth, async (req, res) => {
     const parsedMinLng = minLng ? parseFloat(minLng) : undefined;
     const parsedMaxLng = maxLng ? parseFloat(maxLng) : undefined;
 
-    const limit = parseInt(size);
+    const limit = parseInt(size, 10) || 20;
     const offset = limit * (parseInt(page) - 1);
 
     let where = {};
