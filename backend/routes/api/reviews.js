@@ -60,6 +60,22 @@ const { requireAuth } = require("../../utils/auth");
 //     }
 // });
 
+router.post("/:spotsId", requireAuth, async (req, res) => {
+  try {
+    const { spotsId } = req.params;
+    const { review } = req.body;
+    const userId = req.user.id;
+    const reviewData = await Review.create({
+      userId,
+      review,
+      spotId: spotsId,
+    });
+    res.status(201).json(reviewData);
+  } catch (err) {
+    res.status(500).json({ message: "Error creating a new review" });
+  }
+});
+
 router.get("/current", requireAuth, async (req, res) => {
   try {
     const currentUser = parseInt(req.user.id);
