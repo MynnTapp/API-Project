@@ -48,24 +48,58 @@ const validateQueryParams = [
 
 /**** GET all spots ****/
 router.get("/", validateQueryParams, async (req, res, next) => {
+  let { page, size, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
+  page = page ? page : 1;
+  size = size ? size : 20;
+
+  const where = {};
+
+  /*** search filters ***/
+  if (minLat != undefined || maxLat != undefined) {
+    const filter = [];
+
+    // obligatory "sequelize sucks"
+    if (minLat != undefined) {
+      filter.push({ [Op.gte]: parseFloat(minLat) });
+    }
+
+    if (maxLat != undefined) {
+      filter.push({ [Op.lte]: parseFloat(maxLat) });
+    }
+
+    where.lat = { [Op.and]: filter };
+  }
+
+  if (minLng != undefined || maxLng != undefined) {
+    const filter = [];
+
+    if (minLng != undefined) {
+      filter.push({ [Op.gte]: parseFloat(minLng) });
+    }
+
+    if (maxLng != undefined) {
+      filter.push({ [Op.lte]: parseFloat(maxLng) });
+    }
+
+    where.lng = { [Op.and]: filter };
+  }
+
+  if (minPrice != undefined || maxPrice != undefined) {
+    const filter = [];
+
+    if (minPrice != undefined) {
+      filter.push({ [Op.gte]: parseFloat(minPrice) });
+    }
+
+    if (maxPrice != undefined) {
+      filter.push({ [Op.lte]: parseFloat(maxPrice) });
+    }
+
+    where.price = { [Op.and]: filter };
+  }
+  /*** end search filters ***/
+
   try {
-    let { page = 1, size = 20, minLat, maxLat, minLng, maxLng, minPrice, maxPrice } = req.query;
-
-    const where = {};
-
-    /*** search filters ***/
-    const addFilter = (key, minVal, maxVal) => {
-      const filter = [];
-      if (minVal !== undefined) filter.push({ [Op.gte]: parseFloat(minVal) });
-      if (maxVal !== undefined) filter.push({ [Op.lte]: parseFloat(maxVal) });
-      if (filter.length) where[key] = { [Op.and]: filter };
-    };
-
-    addFilter("lat", minLat, maxLat);
-    addFilter("lng", minLng, maxLng);
-    addFilter("price", minPrice, maxPrice);
-    /*** end search filters ***/
-
     const allSpots = await Spot.findAll({
       offset: (page - 1) * size,
       limit: size,
@@ -84,43 +118,47 @@ router.get("/", validateQueryParams, async (req, res, next) => {
         "price",
         "createdAt",
         "updatedAt",
-        [Sequelize.fn("AVG", Sequelize.col("Reviews.stars")), "avgRating"],
+        [Sequelize.fn("AVG", Sequelize.col("Reviews.stars")), "avgRating"], // Calculate average rating
       ],
       include: [
         {
-          model: SpotImage,
-          attributes: ["url"],
+          model: SpotImage, // Include associated images
+          attributes: ["url"], // Get image URL
           where: { preview: true },
           required: false,
+          duplicating: false,
         },
         {
           model: Review,
           attributes: [],
           required: false,
+          duplicating: false,
         },
       ],
       group: ["Spot.id", "SpotImages.id"],
     });
 
-    const allSpotsArray = allSpots.map((spot) => ({
-      id: spot.id,
-      ownerId: spot.ownerId,
-      address: spot.address,
-      city: spot.city,
-      state: spot.state,
-      country: spot.country,
-      lat: parseFloat(spot.lat),
-      lng: parseFloat(spot.lng),
-      name: spot.name,
-      description: spot.description,
-      price: parseFloat(spot.price),
-      createdAt: spot.createdAt,
-      updatedAt: spot.updatedAt,
-      avgRating: spot.get("avgRating") ? parseFloat(spot.get("avgRating")).toFixed(1) : null,
-      previewImage: spot.SpotImages.length ? spot.SpotImages[0].url : null,
-    }));
+    const allSpotsArray = allSpots.map((spot) => {
+      return {
+        id: spot.id,
+        ownerId: spot.ownerId,
+        address: spot.address,
+        city: spot.city,
+        state: spot.state,
+        country: spot.country,
+        lat: parseFloat(spot.lat), // sometimes these two are strings. i don't know why,
+        lng: parseFloat(spot.lng), // but we'll parse them as floats to fix it.
+        name: spot.name,
+        description: spot.description,
+        price: parseFloat(spot.price), // probably worth doing it here too.
+        createdAt: spot.createdAt,
+        updatedAt: spot.updatedAt,
+        avgRating: spot.get("avgRating") ? parseFloat(spot.get("avgRating")).toFixed(1) : null,
+        previewImage: spot.SpotImages.length ? spot.SpotImages[0].url : null,
+      };
+    });
 
-    return res.status(200).json({ page, size, Spots: allSpotsArray });
+    return res.status(200).json({ page: page, size: size, Spots: allSpotsArray });
   } catch (error) {
     next(error);
   }
